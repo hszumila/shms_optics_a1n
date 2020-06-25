@@ -1,0 +1,102 @@
+OPtics runs A1n
+--------------------
+Run      angle    Momentum
+10301-314 30       2.0
+10326-333 30        2.0
+
+skip run 10310
+
+
+OPtics runs runs d2n
+--------------------
+Run    angle    Momentum
+10776   11         7.5
+10778   11         7.5
+10779   11         7.5
+10780  11         7.5
+
+
+10786  14.5       6.4
+
+10790    18        5.6
+10792    18        5.6
+10793    18        5.6
+10794    18        5.6
+10795    18        5.6
+
+First pass runs in
+/work/hallc/shms/jones/shms_optics_rootfiles
+combined the individual runs into one root file
+shms_replay_matrixopt_10776_10780_-1.root
+shms_replay_matrixopt_10786_-1.root
+shms_replay_matrixopt_10790_10795_-1.root
+
+Unfortunately the first pass replay had a bad gbeam.param
+so reactz is not calculated correctly.
+Does not effect the optics fitting since do not use reactz.
+
+
+
+
+The upstream window is at 30cm
+First set up the ytar/delta cuts.
+10776 set.
+10786 set
+10790 set
+
+Foils 0,1,2,3,4 are  at Z = 20.,13.34,0,-20.,-30.
+
+
+Determine the best Delta cuts.
+
+Need to setup the list_of _optics_runs.dat
+
+Example
+
+10301,10301_10314,30.0,5,1,9
+20.,13.34,0.0,-20.,-30.
+-12.,-11.,-10.,-8.,-6.,-2.,2.,6.,10.,25.
+10776,10776_10780,11.0,5,1,9
+20.,13.34,0.0,-20.,-30.
+-12.,-11.,-10.,-8.,-6.,-2.,2.,6.,10.,25.
+10786,10786,14.5,5,1,9
+20.,13.34,0.0,-20.,-30.
+-12.,-11.,-10.,-8.,-6.,-2.,2.,6.,10.,25.
+10790,10790_10795,18.0,5,1,9
+20.,13.34,0.0,-20.,-30.
+-12.,-11.,-10.,-8.,-6.,-2.,2.,6.,10.,25.
+
+
+
+
+Set YpFp versus YFp cuts for each foil and delta bin
+10776
+
+Set XpFp versus XFp cuts for each foil and delta bin
+10776
+
+Make fit ntuple
+
+make_fit_ntuple.C(10776,"shms_replay_matrixopt_10776_10780_-1")
+
+
+Did fit on the 10776 data.
+
+2nd pass runs with  mkj_fit_10776.dat in
+/work/hallc/shms/jones/shms_optics_rootfiles
+combined the individual runs into one root file
+shms_replay_matrixopt_10301_10314_-2.root
+shms_replay_matrixopt_10776_10780_-2.root
+shms_replay_matrixopt_10786_-2.root
+shms_replay_matrixopt_10790_10795_-2.root
+
+Unfortunately the 2nd pass replay still had a bad gbeam.param
+so reactz is not calculated correctly.
+Does not effect the optics fitting since do not use reactz.
+
+Did the bpm calibration correctly and have new gbeam.param
+
+
+
+
+
