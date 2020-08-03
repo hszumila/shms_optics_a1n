@@ -28,6 +28,9 @@
 using namespace std;
 
 void make_fit_ntuple(Int_t nrun=1814,Int_t FileID=-2){
+  Double_t yMP = 0.0;
+  Double_t xMP = 0.0;
+  
   Bool_t CutYtarFlag=kTRUE;
   Bool_t CutYpFpYFpFlag=kTRUE;
   Bool_t CutXpFpXFpFlag=kTRUE;
@@ -283,14 +286,18 @@ TTree *tsimc = (TTree*) fsimc->Get("T");
 		}
 		 }
 		if (nf_found !=-1 && nd_found!=-1 && ny_found!=-1 && nx_found!=-1) {
-		yptarT = (ys_cent[ny_found]+hb_delta_yptar_coeff*delta-hb_delta_yptar_coeff2*delta*delta+ztar_foil[nf_found]*TMath::Sin(CentAngle))/(zdis_sieve-ztar_foil[nf_found]*TMath::Cos(CentAngle));
-		ytarT = -ztar_foil[nf_found]*(TMath::Sin(CentAngle)+yptarT*TMath::Cos(CentAngle));
-	         xptarT = (xs_cent[nx_found])/(zdis_sieve-ztar_foil[nf_found]*TMath::Cos(CentAngle));
-		ysieveT=ys_cent[ny_found];
-		xsieveT=xs_cent[nx_found];
-		ztarT=ztar_foil[nf_found];
-		ztar=reactz;
-	         otree->Fill();
+		  //yptarT = (ys_cent[ny_found]+hb_delta_yptar_coeff*delta-hb_delta_yptar_coeff2*delta*delta+ztar_foil[nf_found]*TMath::Sin(CentAngle))/(zdis_sieve-ztar_foil[nf_found]*TMath::Cos(CentAngle));
+		  //ytarT = -ztar_foil[nf_found]*(TMath::Sin(CentAngle)+yptarT*TMath::Cos(CentAngle));
+		  //xptarT = (xs_cent[nx_found])/(zdis_sieve-ztar_foil[nf_found]*TMath::Cos(CentAngle));
+		  yptarT = (ys_cent[ny_found]+hb_delta_yptar_coeff*delta-hb_delta_yptar_coeff2*delta*delta+ztar_foil[nf_found]*TMath::Sin(CentAngle)-reactx*TMath::Cos(CentAngle)+yMP)/(zdis_sieve-ztar_foil[nf_found]*TMath::Cos(CentAngle)-reactx*TMath::Sin(CentAngle));
+		  ytarT = -ztar_foil[nf_found]*TMath::Sin(CentAngle)-yptarT*(ztar_foil[nf_found]*TMath::Cos(CentAngle)+reactx*TMath::Sin(CentAngle))+reactx*TMath::Cos(CentAngle)-yMP;
+		  xptarT = (xs_cent[nx_found]+reacty+xMP)/(zdis_sieve-ztar_foil[nf_found]*TMath::Cos(CentAngle)-reactx*TMath::Sin(CentAngle));
+		  
+		  ysieveT=ys_cent[ny_found];
+		  xsieveT=xs_cent[nx_found];
+		  ztarT=ztar_foil[nf_found];
+		  ztar=reactz;
+		  otree->Fill();
 		}
 		}
 	}

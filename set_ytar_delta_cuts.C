@@ -131,7 +131,7 @@ void set_ytar_delta_cuts(Int_t nrun=1813,Int_t FileID=-2) {
 	histView_Cut->cd(1);
 	gPad->SetGridx();
 	gPad->SetGridy();
-	//gPad->SetLogz();    
+	gPad->SetLogz(); //optional   
 	
 	fhistroot->cd();
 	
@@ -144,12 +144,10 @@ void set_ytar_delta_cuts(Int_t nrun=1813,Int_t FileID=-2) {
    
     for (Int_t nf=0;nf<NumFoil;nf++) {
 
-    TCutG*t;
+      TCutG*t;
 
-
-	
-	Int_t nloop=0;
-	while( nloop!=-1) {
+      Int_t nloop=0;
+      while( nloop!=-1) {
         t=(TCutG*)gROOT->FindObject(hname_cut[nf]);
 	fhistroot->cd();
 	fhist->Draw("colz");
@@ -160,45 +158,45 @@ void set_ytar_delta_cuts(Int_t nrun=1813,Int_t FileID=-2) {
  		 t->Draw("same");
 		 t->SetLineColor(1);
 	}
-                  histView_Cut->Update();
-          cout <<" Enter 1 to set cut for foil # " << nf << " (or -1 next foil, -10 delete cut) "  << endl;
-          cin >> nloop ;
-          if(nloop==-10) {
-	      f.cd();
-	      f.Delete(hname_cut[nf]+";1");
-              t=(TCutG*)gROOT->FindObject(hname_cut[nf]+";1");
-	      gROOT->Remove(t);
-              t=(TCutG*)gROOT->FindObject(hname_cut[nf]+";1");
- 	      if (!t) cout << " delete cut = " <<hname_cut[nf]  << endl;
- 	      if (t) cout << " delete cut? = " <<hname_cut[nf]  << endl;
-	      f.Write("",TObject::kOverwrite);
-   	      cout << nf << " delete cut = " <<hname_cut[nf]  << endl;
-          }
-	  
-	  if (nloop!=-1 && nloop!=-10) {
-            cout << " set cut foil = " << nf << endl;
-	      f.cd();
-	      f.Delete(hname_cut[nf]+";1");
-	      f.Write("",TObject::kOverwrite);
-              t=(TCutG*)gROOT->FindObject(hname_cut[nf]+";1");
-	      gROOT->Remove(t);
-              t=(TCutG*)gROOT->FindObject(hname_cut[nf]);
- 	      if (!t) cout << " delete cut = " <<hname_cut[nf]  << endl;
- 	      if (t) cout << " delete cut? = " <<hname_cut[nf]  << endl;
-  	        fhistroot->cd();
-                TCutG*cutg=(TCutG*)gPad->WaitPrimitive("CUTG","CutG");
-                  histView_Cut->Update();
-                  TCutG*tmpg= (TCutG*)gROOT->GetListOfSpecials()->FindObject("CUTG");
-	          TCutG*mycutg=(TCutG*)(tmpg->Clone(hname_cut[nf]));
-	            f.cd();
-	           mycutg->Write("",TObject::kOverwrite);
-	          mycutg->Print();
-                  mycutg->Draw();
-          histView_Cut->Update();
-	  }
-	} // while
-
-   
+	histView_Cut->Update();
+	cout <<" Enter 1 to set cut for foil # " << nf << " (or -1 next foil, -10 delete cut) "  << endl;
+	cin >> nloop ;
+	if(nloop==-10) {
+	  f.cd();
+	  f.Delete(hname_cut[nf]+";1");
+	  t=(TCutG*)gROOT->FindObject(hname_cut[nf]+";1");
+	  gROOT->Remove(t);
+	  t=(TCutG*)gROOT->FindObject(hname_cut[nf]+";1");
+	  if (!t) cout << " delete cut = " <<hname_cut[nf]  << endl;
+	  if (t) cout << " delete cut? = " <<hname_cut[nf]  << endl;
+	  f.Write("",TObject::kOverwrite);
+	  cout << nf << " delete cut = " <<hname_cut[nf]  << endl;
+	}
+	
+	if (nloop!=-1 && nloop!=-10) {
+	  cout << " set cut foil = " << nf << endl;
+	  f.cd();
+	  f.Delete(hname_cut[nf]+";1");
+	  f.Write("",TObject::kOverwrite);
+	  t=(TCutG*)gROOT->FindObject(hname_cut[nf]+";1");
+	  gROOT->Remove(t);
+	  t=(TCutG*)gROOT->FindObject(hname_cut[nf]);
+	  if (!t) cout << " delete cut = " <<hname_cut[nf]  << endl;
+	  if (t) cout << " delete cut? = " <<hname_cut[nf]  << endl;
+	  fhistroot->cd();
+	  TCutG*cutg=(TCutG*)gPad->WaitPrimitive("CUTG","CutG");
+	  histView_Cut->Update();
+	  TCutG*tmpg= (TCutG*)gROOT->GetListOfSpecials()->FindObject("CUTG");
+	  TCutG*mycutg=(TCutG*)(tmpg->Clone(hname_cut[nf]));
+	  f.cd();
+	  mycutg->Write("",TObject::kOverwrite);
+	  mycutg->Print();
+	  mycutg->Draw();
+	  histView_Cut->Update();
+	}
+      } // while
+      
+      
     }
 
 }
