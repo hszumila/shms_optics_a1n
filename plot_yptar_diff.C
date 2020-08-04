@@ -61,6 +61,7 @@ gStyle->SetPalette(1,0);
   vector <Double_t> ztar_foil;
   Int_t ndelcut;
   vector<Double_t > delcut;
+  vector<Double_t > delwidth;
   if (file_optics.is_open()) {
     //
     cout << " Open file = " << OpticsFile << endl;
@@ -90,12 +91,18 @@ gStyle->SetPalette(1,0);
       }
         temp.ReadToDelim(file_optics);
 	ztar_foil.push_back(temp.Atof());
-      for (Int_t nd=0;nd<ndelcut;nd++) {
+      for (Int_t nd=0;nd<ndelcut-1;nd++) {
         temp.ReadToDelim(file_optics,',');
 	delcut.push_back(temp.Atof());
       }
         temp.ReadToDelim(file_optics);
 	delcut.push_back(temp.Atof());
+	for (Int_t nw=0;nw<ndelcut-1;nw++) {
+	temp.ReadToDelim(file_optics,',');
+	delwidth.push_back(temp.Atof());
+      }
+      temp.ReadToDelim(file_optics);
+      delwidth.push_back(temp.Atof());
     }
   } else {
     cout << " No file = " << OpticsFile << endl;    
@@ -183,7 +190,7 @@ gStyle->SetPalette(1,0);
      hZtar[nf] = new TH1F(Form("hZtar_%d",nf),Form("Run %s Ztar %3.2f ; Ztar",tnrun.Data(),ztar_foil[nf]),100,-15.,15.);
         HList.Add(hZtar[nf]);
     for (Int_t nd=0;nd<ndelcut;nd++) {
-      Double_t DelCent=(delcut[nd+1]+delcut[nd])/2;
+      Double_t DelCent=delcut[nd];//(delcut[nd+1]+delcut[nd])/2;
       hYpDiff_YpTrue[nf][nd]  = new TH2F(Form("hYpDiff_YpTrue_%d_DelCut_%d",nf,nd),Form("Run %s Ztar %3.2f DelCut %3.1f; YPtar_true (rad); Yptar_true - Yptar (mr) ",tnrun.Data(),ztar_foil[nf],DelCent),90,-.045,.045,80,-20.,20.);
         HList.Add(hYpDiff_YpTrue[nf][nd]);
     for (Int_t ns=0;ns<11;ns++) {
@@ -200,7 +207,7 @@ Long64_t nentries = FitTree->GetEntries();
     for (Int_t nf=0;nf<NumFoil;nf++) {
       if (abs(ztarT-ztar_foil[nf])<2) { 
        for (Int_t nd=0;nd<ndelcut;nd++) {
-	 if ( delta >=delcut[nd] && delta <delcut[nd+1]) {
+	 if (  delta >=delcut[nd]-delwidth[nd] && delta <delcut[nd]+delwidth[nd]) {
 	hYtar[nf]->Fill(ytar);
 	hZtar[nf]->Fill(ztar);
 	   hYpDiff_YpTrue[nf][nd]->Fill(yptarT,(yptar-yptarT)*1000);
@@ -264,7 +271,7 @@ Long64_t nentries = FitTree->GetEntries();
 		 mgr[nf]=new TMultiGraph();  
 	for  (Int_t nd=0;nd<ndelcut;nd++) {
 	  mgr[nf]->Add(gYpDiff_YpTrue[nf][nd]);
-      Double_t DelCent=(delcut[nd+1]+delcut[nd])/2;
+	  Double_t DelCent=delcut[nd];
       leg[nf]->AddEntry(gYpDiff_YpTrue[nf][nd],Form("Delta = %3.1f",DelCent),"p");
 	    }
 	candel[nf]->cd(1);

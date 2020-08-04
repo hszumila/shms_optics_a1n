@@ -50,6 +50,7 @@ void make_hist_shms_optics(Int_t nrun=1813,Bool_t CutYtarFlag=kTRUE,Bool_t CutYp
   vector <Double_t> ztar_foil;
   Int_t ndelcut=-1;
   vector<Double_t > delcut;
+  vector<Double_t > delwidth;
   if (file_optics.is_open()) {
     //
     cout << " Open file = " << OpticsFile << endl;
@@ -79,12 +80,18 @@ void make_hist_shms_optics(Int_t nrun=1813,Bool_t CutYtarFlag=kTRUE,Bool_t CutYp
       }
       temp.ReadToDelim(file_optics);
       ztar_foil.push_back(temp.Atof());
-      for (Int_t nd=0;nd<ndelcut;nd++) {
+      for (Int_t nd=0;nd<ndelcut-1;nd++) {
         temp.ReadToDelim(file_optics,',');
-	delcut.push_back(temp.Atof());
+      	delcut.push_back(temp.Atof());
       }
       temp.ReadToDelim(file_optics);
       delcut.push_back(temp.Atof());
+      for (Int_t nw=0;nw<ndelcut-1;nw++) {
+	temp.ReadToDelim(file_optics,',');
+	delwidth.push_back(temp.Atof());
+      }
+      temp.ReadToDelim(file_optics);
+      delwidth.push_back(temp.Atof());
     }
   } else {
     cout << " No file = " << OpticsFile << endl;    
@@ -284,19 +291,19 @@ void make_hist_shms_optics(Int_t nrun=1813,Bool_t CutYtarFlag=kTRUE,Bool_t CutYp
     hYpFpYFp[nc] = new TH2F(Form("hYpFpYFp_%d",nc),Form("Run %d Foil %d; Ypfp ; Yfp",nrun,nc),100,-.05,.05,100,-35.,35.);
     HList.Add(hYpFpYFp[nc]);
     for  (Int_t nd=0;nd<ndelcut;nd++) {
-      hYsXs_DelCut[nc][nd]  = new TH2F(Form("hYsXs_Foil_%d_DelCut_%d",nc,nd),Form("Run %d Foil %d DelCut %3.1f; Ys ; Xs",nrun,nc,(delcut[nd+1]+delcut[nd])/2),50,-12,12,100,-15.,15.);
+      hYsXs_DelCut[nc][nd]  = new TH2F(Form("hYsXs_Foil_%d_DelCut_%d",nc,nd),Form("Run %d Foil %d DelCut %3.1f; Ys ; Xs",nrun,nc,delcut[nd]),50,-12,12,100,-15.,15.);
       HList.Add(hYsXs_DelCut[nc][nd]);
       for  (Int_t ny=0;ny<11;ny++) {
-	hYsXs_DelCut_YpYfpCut[nc][nd][ny]  = new TH2F(Form("hYsXs_Foil_%d_DelCut_%d_FpCut_%d",nc,nd,ny),Form("Run %d Foil %d DelCut %3.1f Ys=%d; Ys ; Xs",nrun,nc,(delcut[nd+1]+delcut[nd])/2,ny),100,-12,12,100,-15.,15.);
+	hYsXs_DelCut_YpYfpCut[nc][nd][ny]  = new TH2F(Form("hYsXs_Foil_%d_DelCut_%d_FpCut_%d",nc,nd,ny),Form("Run %d Foil %d DelCut %3.1f Ys=%d; Ys ; Xs",nrun,nc,delcut[nd],ny),100,-12,12,100,-15.,15.);
 	HList.Add(hYsXs_DelCut_YpYfpCut[nc][nd][ny]);
-	hYsXs_DelCut_XpXfpCut[nc][nd][ny]  = new TH2F(Form("hYsXs_Foil_%d_DelCut_%d_XFpCut_%d",nc,nd,ny),Form("Run %d Foil %d DelCut %3.1f Xs=%d; Ys ; Xs",nrun,nc,(delcut[nd+1]+delcut[nd])/2,ny),100,-12,12,100,-15.,15.);
+	hYsXs_DelCut_XpXfpCut[nc][nd][ny]  = new TH2F(Form("hYsXs_Foil_%d_DelCut_%d_XFpCut_%d",nc,nd,ny),Form("Run %d Foil %d DelCut %3.1f Xs=%d; Ys ; Xs",nrun,nc,delcut[nd],ny),100,-12,12,100,-15.,15.);
 	HList.Add(hYsXs_DelCut_XpXfpCut[nc][nd][ny]);
-	hXs_DelCut_YpYfpCut[nc][nd][ny]  = new TH1F(Form("hXs_Foil_%d_DelCut_%d_FpCut_%d",nc,nd,ny),Form("Run %d Foil %d DelCut %3.1f Ys=%d; Xs",nrun,nc,(delcut[nd+1]+delcut[nd])/2,ny),100,-15.,15.);
+	hXs_DelCut_YpYfpCut[nc][nd][ny]  = new TH1F(Form("hXs_Foil_%d_DelCut_%d_FpCut_%d",nc,nd,ny),Form("Run %d Foil %d DelCut %3.1f Ys=%d; Xs",nrun,nc,delcut[nd],ny),100,-15.,15.);
 	HList.Add(hXs_DelCut_YpYfpCut[nc][nd][ny]);
       }
-      hYpFpYFp_DelCut[nc][nd]  = new TH2F(Form("hYpFpYFp_%d_DelCut_%d",nc,nd),Form("Run %d Foil %d DelCut %3.1f; Ypfp ; Yfp",nrun,nc,(delcut[nd+1]+delcut[nd])/2),75,-.05,.05,150,-35.,35.);
+      hYpFpYFp_DelCut[nc][nd]  = new TH2F(Form("hYpFpYFp_%d_DelCut_%d",nc,nd),Form("Run %d Foil %d DelCut %3.1f; Ypfp ; Yfp",nrun,nc,delcut[nd]),75,-.05,.05,150,-35.,35.);
       HList.Add(hYpFpYFp_DelCut[nc][nd]);
-      hXpFpXFp_DelCut[nc][nd]= new TH2F(Form("hXpFpXFp_%d_DelCut_%d",nc,nd),Form("Run %d Foil %d DelCut %3.1f; Xpfp ; Xfp",nrun,nc,(delcut[nd+1]+delcut[nd])/2),150,-.1,.1,150,-40.,40.);
+      hXpFpXFp_DelCut[nc][nd]= new TH2F(Form("hXpFpXFp_%d_DelCut_%d",nc,nd),Form("Run %d Foil %d DelCut %3.1f; Xpfp ; Xfp",nrun,nc,delcut[nd]),150,-.1,.1,150,-40.,40.);
       HList.Add(hXpFpXFp_DelCut[nc][nd]);
     }
   }	  
@@ -327,7 +334,8 @@ void make_hist_shms_optics(Int_t nrun=1813,Bool_t CutYtarFlag=kTRUE,Bool_t CutYp
 	  hXsDelta[nc]->Fill(xsieve,delta);
 	  hYpFpYFp[nc]->Fill(ypfp,yfp);
 	  for  (Int_t nd=0;nd<ndelcut;nd++) {
-	    if ( delta >=delcut[nd] && delta <delcut[nd+1]) {
+	    //if ( delta >=delcut[nd] && delta <delcut[nd+1]) {
+	    if ( delta >=delcut[nd]-delwidth[nd] && delta <delcut[nd]+delwidth[nd]) {
 	      hYsXs_DelCut[nc][nd]->Fill(ysieve,xsieve); 
 	      hYpFpYFp_DelCut[nc][nd]->Fill(ypfp,yfp);
 	      hXpFpXFp_DelCut[nc][nd]->Fill(xpfp,xfp);

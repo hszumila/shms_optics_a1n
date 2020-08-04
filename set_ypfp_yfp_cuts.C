@@ -52,6 +52,7 @@ void set_ypfp_yfp_cuts(Int_t nrun=1814,Int_t FileID=-2,Double_t hist_minZ=1.) {
   vector <Double_t> ztar_foil;
   Int_t ndelcut;
   vector<Double_t > delcut;
+  vector<Double_t > delwidth;
   if (file_optics.is_open()) {
     //
     cout << " Open file = " << OpticsFile << endl;
@@ -81,12 +82,18 @@ void set_ypfp_yfp_cuts(Int_t nrun=1814,Int_t FileID=-2,Double_t hist_minZ=1.) {
       }
       temp.ReadToDelim(file_optics);
       ztar_foil.push_back(temp.Atof());
-      for (Int_t nd=0;nd<ndelcut;nd++) {
+      for (Int_t nd=0;nd<ndelcut-1;nd++) {
         temp.ReadToDelim(file_optics,',');
 	delcut.push_back(temp.Atof());
       }
       temp.ReadToDelim(file_optics);
       delcut.push_back(temp.Atof());
+       for (Int_t nw=0;nw<ndelcut-1;nw++) {
+	temp.ReadToDelim(file_optics,',');
+	delwidth.push_back(temp.Atof());
+      }
+      temp.ReadToDelim(file_optics);
+      delwidth.push_back(temp.Atof());
     }
   } else {
     cout << " No file = " << OpticsFile << endl;    
@@ -252,7 +259,7 @@ void set_ypfp_yfp_cuts(Int_t nrun=1814,Int_t FileID=-2,Double_t hist_minZ=1.) {
   for  (Int_t nyscol=0;nyscol<11;nyscol++) {
     for  (Int_t nd=0;nd<ndelcut;nd++) {
       for  (Int_t nf=0;nf<NumFoil;nf++) {
-	Double_t DelCent = (delcut[nd+1]+delcut[nd])/2;
+	Double_t DelCent = delcut[nd];//(delcut[nd+1]+delcut[nd])/2;
 	yptar = (ys_cent[nyscol]+hb_delta_yptar_coeff*DelCent+ztar_foil[nf]*TMath::Sin(CentAngle))/(zdis_sieve-ztar_foil[nf]*TMath::Cos(CentAngle));
 	ytar = -ztar_foil[nf]*(TMath::Sin(CentAngle)+yptar*TMath::Cos(CentAngle));
 	yfpfirst = -1.89*ytar-0.16*yptar-0.09*DelCent;
@@ -312,7 +319,7 @@ void set_ypfp_yfp_cuts(Int_t nrun=1814,Int_t FileID=-2,Double_t hist_minZ=1.) {
     if (nd !=-1)cout << " Which foil ? " << " nf = " << nf<< endl;
     if (nd !=-1)cin >> nf;
     if (nf >=NumFoil)nf=0;
-    Double_t DelCent = (delcut[nd+1]+delcut[nd])/2;
+    Double_t DelCent = delcut[nd];//(delcut[nd+1]+delcut[nd])/2;
     nloop=-1;
     if (nd !=-1) nloop=0;
     while (nloop !=-1 ) {

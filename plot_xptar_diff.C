@@ -61,6 +61,7 @@ gStyle->SetPalette(1,0);
   vector <Double_t> ztar_foil;
   Int_t ndelcut;
   vector<Double_t > delcut;
+  vector<Double_t > delwidth;
   if (file_optics.is_open()) {
     //
     cout << " Open file = " << OpticsFile << endl;
@@ -90,12 +91,18 @@ gStyle->SetPalette(1,0);
       }
         temp.ReadToDelim(file_optics);
 	ztar_foil.push_back(temp.Atof());
-      for (Int_t nd=0;nd<ndelcut;nd++) {
+      for (Int_t nd=0;nd<ndelcut-1;nd++) {
         temp.ReadToDelim(file_optics,',');
 	delcut.push_back(temp.Atof());
       }
         temp.ReadToDelim(file_optics);
 	delcut.push_back(temp.Atof());
+	for (Int_t nw=0;nw<ndelcut-1;nw++) {
+	temp.ReadToDelim(file_optics,',');
+	delwidth.push_back(temp.Atof());
+      }
+      temp.ReadToDelim(file_optics);
+      delwidth.push_back(temp.Atof());
     }
   } else {
     cout << " No file = " << OpticsFile << endl;    
@@ -217,7 +224,7 @@ gStyle->SetPalette(1,0);
      hZtar[nf] = new TH1F(Form("hZtar_%d",nf),Form("Run %s Ztar %3.2f ; Ztar",tnrun.Data(),ztar_foil[nf]),100,-15.,15.);
         HList.Add(hZtar[nf]);
     for (Int_t nd=0;nd<ndelcut;nd++) {
-      Double_t DelCent=(delcut[nd+1]+delcut[nd])/2;
+      Double_t DelCent=delcut[nd];//(delcut[nd+1]+delcut[nd])/2;
       hXpDiff_XpTrue[nf][nd]  = new TH2F(Form("hXpDiff_XpTrue_%d_DelCut_%d",nf,nd),Form("Run %s Ztar %3.2f DelCut %3.1f; Xptar_true (rad); Xptar_true - Xptar (mr) ",tnrun.Data(),ztar_foil[nf],DelCent),90,-.045,.045,80,-20.,20.);
         HList.Add(hXpDiff_XpTrue[nf][nd]);
     for (Int_t nxs=0;nxs<11;nxs++) {
@@ -240,7 +247,7 @@ Long64_t nentries = FitTree->GetEntries();
     for (Int_t nf=0;nf<NumFoil;nf++) {
       if (abs(ztarT-ztar_foil[nf])<2) { 
        for (Int_t nd=0;nd<ndelcut;nd++) {
-	 if ( delta >=delcut[nd] && delta <delcut[nd+1]) {
+	 if ( delta >=delcut[nd]-delwidth[nd] && delta <delcut[nd]+delwidth[nd]) {
 	hYtar[nf]->Fill(ytar);
 	hZtar[nf]->Fill(ztar);
 	   hXpDiff_XpTrue[nf][nd]->Fill(xptarT,(xptar-xptarT)*1000);
@@ -332,7 +339,7 @@ Long64_t nentries = FitTree->GetEntries();
 	  mgrFoilDel[nf][nd]->Add(gXpDiff_Ys_XpTrue[nf][nd][nxs]);
       legFoilDel[nf][nd]->AddEntry(gXpDiff_Ys_XpTrue[nf][nd][nxs],Form("Xs = %3.1f",xs_cent[nxs]),"p");
 	     }
-      Double_t DelCent=(delcut[nd+1]+delcut[nd])/2;
+	     Double_t DelCent=delcut[nd];//(delcut[nd+1]+delcut[nd])/2;
 	  	  canFoilDel[nf][nd]->cd(1);
 		  mgrFoilDel[nf][nd]->SetTitle(Form("Ztar = %4.1f Del = %3.1f SHMS Angle = %4.2f; Y_sieve (cm); Xptar -Xp_true (mr)",ztar_foil[nf],DelCent,CentAngle));
 	mgrFoilDel[nf][nd]->SetMinimum(-20);
@@ -355,7 +362,7 @@ Long64_t nentries = FitTree->GetEntries();
 		 mgr[nf]=new TMultiGraph();  
 	for  (Int_t nd=0;nd<ndelcut;nd++) {
 	  mgr[nf]->Add(gXpDiff_XpTrue[nf][nd]);
-      Double_t DelCent=(delcut[nd+1]+delcut[nd])/2;
+	  Double_t DelCent=delcut[nd];//(delcut[nd+1]+delcut[nd])/2;
       leg[nf]->AddEntry(gXpDiff_XpTrue[nf][nd],Form("Delta = %3.1f",DelCent),"p");
 	    }
 	candel[nf]->cd(1);

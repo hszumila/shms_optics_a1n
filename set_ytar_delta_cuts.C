@@ -52,6 +52,7 @@ void set_ytar_delta_cuts(Int_t nrun=1813,Int_t FileID=-2) {
   vector <Double_t> ztar_foil;
   Int_t ndelcut;
   vector<Double_t > delcut;
+  vector<Double_t > delwidth;
   if (file_optics.is_open()) {
     //
     cout << " Open file = " << OpticsFile << endl;
@@ -81,12 +82,18 @@ void set_ytar_delta_cuts(Int_t nrun=1813,Int_t FileID=-2) {
       }
         temp.ReadToDelim(file_optics);
 	ztar_foil.push_back(temp.Atof());
-      for (Int_t nd=0;nd<ndelcut;nd++) {
+      for (Int_t nd=0;nd<ndelcut-1;nd++) {
         temp.ReadToDelim(file_optics,',');
 	delcut.push_back(temp.Atof());
       }
         temp.ReadToDelim(file_optics);
 	delcut.push_back(temp.Atof());
+	for (Int_t nw=0;nw<ndelcut-1;nw++) {
+	temp.ReadToDelim(file_optics,',');
+	delwidth.push_back(temp.Atof());
+      }
+      temp.ReadToDelim(file_optics);
+      delwidth.push_back(temp.Atof());
     }
   } else {
     cout << " No file = " << OpticsFile << endl;    

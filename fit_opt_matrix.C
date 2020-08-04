@@ -31,8 +31,9 @@ void fit_opt_matrix(TString fname="Optics_1814_1919_shms_newfit3_tree") {
   string newcoeffsfilename="newfit.dat";
   //string oldcoeffsfilename="shms_newfit_april2020.dat";
   //string oldcoeffsfilename="mkj_fit_10776.dat";//shms_newfit_april2020.dat";
-  string oldcoeffsfilename="hsv_fit_10790_stripped.dat";//shms_newfit_april2020.dat";
-  int nfit=0,npar,nfit_max=20537,npar_final=0,max_order=6,norder;
+  //string oldcoeffsfilename="hsv_fit_10790_stripped.dat";//shms_newfit_april2020.dat";
+  string oldcoeffsfilename="hsv_fit_10790_low_stripped.dat";//shms_newfit_april2020.dat";
+  int nfit=0,npar,nfit_max=19328,npar_final=0,max_order=6,norder;
   Int_t MaxPerBin=200;
   Int_t MaxZtarPerBin=10000;
   //
@@ -209,17 +210,18 @@ void fit_opt_matrix(TString fname="Optics_1814_1919_shms_newfit3_tree") {
   //
   vector<Int_t > Ztar_Cnts;
   vector<vector<vector<Int_t> > > Ztar_Ys_Delta_Cnts;
-  const Int_t nfoils=5;
+  const Int_t nfoils=3;
   vector <Double_t> ztar_foil;
-  ztar_foil.push_back(20.);
+  //ztar_foil.push_back(20.);
   ztar_foil.push_back(6.67*2);
   ztar_foil.push_back(0.0);
   ztar_foil.push_back(-20.0);
-  ztar_foil.push_back(-30.0);
+  //ztar_foil.push_back(-30.0);
   Ztar_Cnts.resize(nfoils);
   Ztar_Ys_Delta_Cnts.resize(nfoils);
-  static const Int_t ndelcut=9;
-  Double_t delcut[ndelcut+1]={-12.,-11,-10,-8,-6,-2,2,6,10,25};
+  static const Int_t ndelcut=7;
+  Double_t delcut[ndelcut]={-11.,-8.,-4.,0,4.,8.,17.5};
+  Double_t delwidth[ndelcut]={1.0,2.0,2.0,2.0,2.0,2.0,7.5};
   const Int_t nysieve=11;
   vector <Double_t> ys_cent;
   for (Int_t nys=0;nys<nysieve;nys++) {
@@ -272,7 +274,7 @@ void fit_opt_matrix(TString fname="Optics_1814_1919_shms_newfit3_tree") {
 	  if (abs(ztarT-ztar_foil[nf])<1) found_nf=nf;
 	}
 	for (Int_t nd=0;nd<ndelcut;nd++) {
-	  if (delta >=delcut[nd] && delta <delcut[nd+1]) found_nd=nd;
+	  if (delta >=delcut[nd]-delwidth[nd] && delta <delcut[nd]+delwidth[nd]) found_nd=nd;
 	}
 	for (Int_t ny=0;ny<nysieve;ny++) {	
 	  if (abs(ysieveT-ys_cent[ny])<.5) found_ny=ny;
@@ -339,7 +341,7 @@ void fit_opt_matrix(TString fname="Optics_1814_1919_shms_newfit3_tree") {
   for (Int_t nf=0;nf<nfoils;nf++) {
     cout << " ztar = " << ztar_foil[nf] << endl;
     for (Int_t nd=0;nd<ndelcut;nd++) {
-      cout << " Ndelta = " << (delcut[nd]+delcut[nd+1])/2 << endl;       
+      cout << " Ndelta = " << delcut[nd] << endl;       
       for (Int_t ny=0;ny<nysieve;ny++) {	
 	cout <<  Ztar_Ys_Delta_Cnts[nf][nd][ny] << " " ;
       }

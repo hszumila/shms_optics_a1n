@@ -61,6 +61,7 @@ gStyle->SetPalette(1,0);
   vector <Double_t> ztar_foil;
   Int_t ndelcut;
   vector<Double_t > delcut;
+  vector<Double_t > delwidth;
   if (file_optics.is_open()) {
     //
     cout << " Open file = " << OpticsFile << endl;
@@ -90,12 +91,18 @@ gStyle->SetPalette(1,0);
       }
         temp.ReadToDelim(file_optics);
 	ztar_foil.push_back(temp.Atof());
-      for (Int_t nd=0;nd<ndelcut;nd++) {
+      for (Int_t nd=0;nd<ndelcut-1;nd++) {
         temp.ReadToDelim(file_optics,',');
 	delcut.push_back(temp.Atof());
       }
         temp.ReadToDelim(file_optics);
 	delcut.push_back(temp.Atof());
+	for (Int_t nw=0;nw<ndelcut-1;nw++) {
+	temp.ReadToDelim(file_optics,',');
+	delwidth.push_back(temp.Atof());
+      }
+      temp.ReadToDelim(file_optics);
+      delwidth.push_back(temp.Atof());
     }
   } else {
     cout << " No file = " << OpticsFile << endl;    
@@ -204,7 +211,7 @@ gStyle->SetPalette(1,0);
      hZtar[nf] = new TH1F(Form("hZtar_%d",nf),Form("Run %s Ztar %3.2f ; Ztar",tnrun.Data(),ztar_foil[nf]),100,-35.,35.);
         HList.Add(hZtar[nf]);
     for (Int_t nd=0;nd<ndelcut;nd++) {
-      Double_t DelCent=(delcut[nd+1]+delcut[nd])/2;
+      Double_t DelCent=delcut[nd];//(delcut[nd+1]+delcut[nd])/2;
       hYDiff_YpTrue[nf][nd]  = new TH2F(Form("hYDiff_YTrue_%d_DelCut_%d",nf,nd),Form("Run %s Ztar %3.2f DelCut %3.1f; Yptar_true (rad); Ytar_true - Ytar (mr) ",tnrun.Data(),ztar_foil[nf],DelCent),90,-.045,.045,50,-5.,5.);
         HList.Add(hYDiff_YpTrue[nf][nd]);
       hYDiff_ztar[nf][nd]  = new TH1F(Form("hYDiff_%d_DelCut_%d",nf,nd),Form("Run %s Ztar %3.2fDelCut %3.1f; Ytar_true - Ytar (cm)",tnrun.Data(),ztar_foil[nf],DelCent),50,-5.,5.);
@@ -223,7 +230,7 @@ Long64_t nentries = FitTree->GetEntries();
     for (Int_t nf=0;nf<NumFoil;nf++) {
       if (abs(ztarT-ztar_foil[nf])<2) { 
        for (Int_t nd=0;nd<ndelcut;nd++) {
-	 if ( delta >=delcut[nd] && delta <delcut[nd+1]) {
+	 if ( delta >=delcut[nd]-delwidth[nd] && delta <delcut[nd]+delwidth[nd]) {
 	hYtar[nf]->Fill(ytar);
 	hZtar[nf]->Fill(ztar);
 	   hYDiff_YpTrue[nf][nd]->Fill(yptarT,(ytar-ytarT-.035));
@@ -246,7 +253,7 @@ Long64_t nentries = FitTree->GetEntries();
 	for  (Int_t nd=0;nd<ndelcut;nd++) {
 	  can2d[nc]->cd(nd+1);
 	  //	  hYDiff_YpTrue[nc][nd]->Draw("colz");
-                 Double_t DelCent=(delcut[nd+1]+delcut[nd])/2;
+	  Double_t DelCent=delcut[nd];//(delcut[nd+1]+delcut[nd])/2;
 	 	  hYDiff_ztar[nc][nd]->Draw("colz");
 		  hYDiff_ztar_mean[nc][nd]= hYDiff_ztar[nc][nd]->GetMean();
 	     hYDiff_ztar_sigma[nc][nd]= hYDiff_ztar[nc][nd]->GetRMS();
@@ -319,7 +326,7 @@ Long64_t nentries = FitTree->GetEntries();
 		 mgr[nf]=new TMultiGraph();  
 	for  (Int_t nd=0;nd<ndelcut;nd++) {
 	  mgr[nf]->Add(gYDiff_YpTrue[nf][nd]);
-      Double_t DelCent=(delcut[nd+1]+delcut[nd])/2;
+	  Double_t DelCent=delcut[nd];//(delcut[nd+1]+delcut[nd])/2;
       leg[nf]->AddEntry(gYDiff_YpTrue[nf][nd],Form("Delta = %3.1f",DelCent),"p");
 	    }
 	candel[nf]->cd(1);

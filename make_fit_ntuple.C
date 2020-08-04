@@ -56,6 +56,7 @@ gStyle->SetPalette(1,0);
   vector <Double_t> ztar_foil;
   Int_t ndelcut;
   vector<Double_t > delcut;
+  vector<Double_t > delwidth;
   if (file_optics.is_open()) {
     //
     cout << " Open file = " << OpticsFile << endl;
@@ -85,12 +86,18 @@ gStyle->SetPalette(1,0);
       }
         temp.ReadToDelim(file_optics);
 	ztar_foil.push_back(temp.Atof());
-      for (Int_t nd=0;nd<ndelcut;nd++) {
+      for (Int_t nd=0;nd<ndelcut-1;nd++) {
         temp.ReadToDelim(file_optics,',');
 	delcut.push_back(temp.Atof());
       }
         temp.ReadToDelim(file_optics);
 	delcut.push_back(temp.Atof());
+	for (Int_t nw=0;nw<ndelcut-1;nw++) {
+	temp.ReadToDelim(file_optics,',');
+	delwidth.push_back(temp.Atof());
+      }
+      temp.ReadToDelim(file_optics);
+      delwidth.push_back(temp.Atof());
     }
   } else {
     cout << " No file = " << OpticsFile << endl;    
@@ -275,7 +282,7 @@ TTree *tsimc = (TTree*) fsimc->Get("T");
 		   if (ytar_delta_cut[nf]->IsInside(ytar,delta)) nf_found=nf;
 		 } 
                  for  (UInt_t nd=0;nd<ndelcut;nd++) {
-		   if ( delta >=delcut[nd] && delta <delcut[nd+1])  nd_found=nd;
+		   if ( delta >=delcut[nd]-delwidth[nd] && delta <delcut[nd]+delwidth[nd])  nd_found=nd;
 		     }
 		 if (nf_found!=-1 && nd_found!=-1) {
                 for  (UInt_t ny=0;ny<11;ny++) {
